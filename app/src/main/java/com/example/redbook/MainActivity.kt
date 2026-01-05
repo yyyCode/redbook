@@ -7,12 +7,21 @@ import androidx.activity.enableEdgeToEdge
 import com.example.redbook.ui.MainScreen
 import com.example.redbook.ui.theme.RedbookTheme
 
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.redbook.viewmodel.AppViewModelProvider
+import com.example.redbook.viewmodel.MainViewModel
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            RedbookTheme {
+            val viewModel: MainViewModel = viewModel(factory = AppViewModelProvider.Factory)
+            val isDarkMode by viewModel.isDarkMode.collectAsState()
+
+            RedbookTheme(darkTheme = isDarkMode) {
                 MainScreen()
             }
         }

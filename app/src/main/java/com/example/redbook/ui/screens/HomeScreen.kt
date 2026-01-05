@@ -32,10 +32,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.example.redbook.viewmodel.HomeViewModel
+import com.example.redbook.viewmodel.AppViewModelProvider
 import com.example.redbook.model.Post
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
+fun HomeScreen(viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
     val titles = listOf("关注", "发现", "附近")
     val pagerState = rememberPagerState(pageCount = { titles.size }, initialPage = 1)
     val scope = rememberCoroutineScope()

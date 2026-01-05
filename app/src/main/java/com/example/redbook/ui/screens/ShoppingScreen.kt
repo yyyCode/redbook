@@ -51,10 +51,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.example.redbook.viewmodel.ShoppingViewModel
+import com.example.redbook.viewmodel.AppViewModelProvider
 import com.example.redbook.model.Product
 
 @Composable
-fun ShoppingScreen(viewModel: ShoppingViewModel = viewModel()) {
+fun ShoppingScreen(viewModel: ShoppingViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
     val products by viewModel.products.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
 

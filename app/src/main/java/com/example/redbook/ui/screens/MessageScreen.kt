@@ -47,10 +47,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.example.redbook.viewmodel.MessageViewModel
+import com.example.redbook.viewmodel.AppViewModelProvider
 import com.example.redbook.viewmodel.SuggestedUser
 
 @Composable
-fun MessageScreen(viewModel: MessageViewModel = viewModel()) {
+fun MessageScreen(viewModel: MessageViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
     val suggestedUsers by viewModel.suggestedUsers.collectAsState()
 
     Column(

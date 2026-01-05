@@ -56,10 +56,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.example.redbook.viewmodel.MeViewModel
+import com.example.redbook.viewmodel.AppViewModelProvider
 import com.example.redbook.viewmodel.UserProfile
 
 @Composable
-fun MeScreen(viewModel: MeViewModel = viewModel()) {
+fun MeScreen(viewModel: MeViewModel = viewModel(factory = AppViewModelProvider.Factory), onPublishClick: () -> Unit) {
     val userProfile by viewModel.userProfile.collectAsState()
     val selectedTab by viewModel.selectedTab.collectAsState()
 
@@ -75,7 +76,7 @@ fun MeScreen(viewModel: MeViewModel = viewModel()) {
         item { ActionButtons() }
         item { QuickCards() }
         item { TabsSection(selectedTab, viewModel::onTabSelected) }
-        item { EmptyCollection() }
+        item { EmptyCollection(onPublishClick) }
     }
 }
 
@@ -308,7 +309,7 @@ fun TabsSection(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
 }
 
 @Composable
-fun EmptyCollection() {
+fun EmptyCollection(onPublishClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -328,7 +329,7 @@ fun EmptyCollection() {
         Text(text = "小红书冲浪新发现", color = Color(0xFF666666), fontSize = 13.sp)
         Spacer(modifier = Modifier.height(12.dp))
         Button(
-            onClick = {},
+            onClick = onPublishClick,
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEDEDED)),
             shape = RoundedCornerShape(20.dp),
             contentPadding = PaddingValues(horizontal = 18.dp, vertical = 8.dp)

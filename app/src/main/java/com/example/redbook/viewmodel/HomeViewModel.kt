@@ -7,25 +7,30 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class HomeViewModel : ViewModel() {
-    private val _followPosts = MutableStateFlow<List<Post>>(emptyList())
-    val followPosts: StateFlow<List<Post>> = _followPosts.asStateFlow()
+import androidx.lifecycle.viewModelScope
+import com.example.redbook.data.repository.PostRepository
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 
-    private val _explorePosts = MutableStateFlow<List<Post>>(emptyList())
-    val explorePosts: StateFlow<List<Post>> = _explorePosts.asStateFlow()
+class HomeViewModel(postRepository: PostRepository) : ViewModel() {
+    val followPosts: StateFlow<List<Post>> = postRepository.posts
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
-    private val _nearbyPosts = MutableStateFlow<List<Post>>(emptyList())
-    val nearbyPosts: StateFlow<List<Post>> = _nearbyPosts.asStateFlow()
+    val explorePosts: StateFlow<List<Post>> = postRepository.posts
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
-    init {
-        // Simulate loading data
-        loadPosts()
-    }
-
-    private fun loadPosts() {
-        // In a real app, this would fetch from a repository/API
-        _followPosts.value = mockPosts + mockPosts + mockPosts
-        _explorePosts.value = mockPosts + mockPosts + mockPosts
-        _nearbyPosts.value = mockPosts + mockPosts + mockPosts
-    }
+    val nearbyPosts: StateFlow<List<Post>> = postRepository.posts
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 }
