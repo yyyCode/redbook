@@ -57,14 +57,14 @@
 请将实际截图替换下方占位路径并提交到仓库中。
 
 ### 首页
-![首页](/screenshots/1.png)
+screenshots/1.png
 
 ### 购物
-![购物](screenshots/2.png)
+screenshots/2.png
 
 ### 消息
-![消息](screenshots/3.png)
+screenshots/3.png
 
 ### 我
-![我](screenshots/4.png)
+screenshots/4.png
 
