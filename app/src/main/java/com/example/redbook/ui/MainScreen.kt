@@ -22,7 +22,7 @@ import com.example.redbook.ui.navigation.bottomNavItems
 import com.example.redbook.ui.screens.HomeScreen
 import com.example.redbook.ui.screens.MeScreen
 import com.example.redbook.ui.screens.MessageScreen
-import com.example.redbook.ui.screens.VideoScreen
+import com.example.redbook.ui.screens.ShoppingScreen
 
 @Composable
 fun MainScreen() {
@@ -70,7 +70,7 @@ fun MainScreen() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Home.route) { HomeScreen() }
-            composable(Screen.Video.route) { VideoScreen() }
+            composable(Screen.Shopping.route) { ShoppingScreen() }
             composable(Screen.Message.route) { MessageScreen() }
             composable(Screen.Me.route) { MeScreen() }
         }
