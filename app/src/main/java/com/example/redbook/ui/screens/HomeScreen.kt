@@ -28,11 +28,21 @@ import com.example.redbook.model.mockPosts
 import com.example.redbook.ui.components.PostItem
 import kotlinx.coroutines.launch
 
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.example.redbook.viewmodel.HomeViewModel
+import com.example.redbook.model.Post
+
 @Composable
-fun HomeScreen() {
+fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
     val titles = listOf("关注", "发现", "附近")
     val pagerState = rememberPagerState(pageCount = { titles.size }, initialPage = 1)
     val scope = rememberCoroutineScope()
+    
+    val followPosts by viewModel.followPosts.collectAsState()
+    val explorePosts by viewModel.explorePosts.collectAsState()
+    val nearbyPosts by viewModel.nearbyPosts.collectAsState()
 
     Scaffold(
         topBar = {
@@ -73,9 +83,9 @@ fun HomeScreen() {
         ) { page ->
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 when (page) {
-                    0 -> FollowTab()
-                    1 -> ExploreTab()
-                    2 -> NearbyTab()
+                    0 -> FollowTab(posts = followPosts)
+                    1 -> ExploreTab(posts = explorePosts)
+                    2 -> NearbyTab(posts = nearbyPosts)
                 }
             }
         }
@@ -83,8 +93,7 @@ fun HomeScreen() {
 }
 
 @Composable
-fun FollowTab() {
-    val posts = com.example.redbook.model.mockPosts + com.example.redbook.model.mockPosts + com.example.redbook.model.mockPosts
+fun FollowTab(posts: List<Post>) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = androidx.compose.foundation.layout.PaddingValues(8.dp)
@@ -96,9 +105,7 @@ fun FollowTab() {
 }
 
 @Composable
-fun ExploreTab() {
-    val posts = mockPosts + mockPosts + mockPosts // Duplicate for scrolling
-    
+fun ExploreTab(posts: List<Post>) {
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2),
         modifier = Modifier.fillMaxSize().padding(4.dp),
@@ -112,8 +119,7 @@ fun ExploreTab() {
 }
 
 @Composable
-fun NearbyTab() {
-    val posts = com.example.redbook.model.mockPosts + com.example.redbook.model.mockPosts + com.example.redbook.model.mockPosts
+fun NearbyTab(posts: List<Post>) {
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2),
         modifier = Modifier.fillMaxSize().padding(4.dp),

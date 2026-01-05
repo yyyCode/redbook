@@ -43,33 +43,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 
-data class SuggestedUser(
-    val id: Int,
-    val name: String,
-    val avatarUrl: String,
-    val subtitle: String,
-    val tag: String? = null,
-    val followed: Boolean = false
-)
-
-val mockSuggestedUsers = listOf(
-    SuggestedUser(1, "宠物小伙伴", "https://picsum.photos/80/80?random=11", "你的专属聊天搭子", "要找你", false),
-    SuggestedUser(2, "睡眠好（三里陪拍）", "https://picsum.photos/80/80?random=12", "你近期赞过", null, false),
-    SuggestedUser(3, "小陈超爱零条", "https://picsum.photos/80/80?random=13", "你近期赞过", null, false),
-    SuggestedUser(4, "ice拿铁", "https://picsum.photos/80/80?random=14", "你近期赞过", null, false)
-)
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.example.redbook.viewmodel.MessageViewModel
+import com.example.redbook.viewmodel.SuggestedUser
 
 @Composable
-fun MessageScreen() {
+fun MessageScreen(viewModel: MessageViewModel = viewModel()) {
+    val suggestedUsers by viewModel.suggestedUsers.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF191919))
+            .background(Color(0xFFF5F5F5))
     ) {
         TopBar()
         ShortcutRow()
         EmptyState()
-        SuggestionSection()
+        SuggestionSection(suggestedUsers)
     }
 }
 
@@ -82,12 +74,12 @@ fun TopBar() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-            Text(text = "消息", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+            Text(text = "消息", color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(imageVector = Icons.Filled.Search, contentDescription = "", tint = Color.White, modifier = Modifier.size(22.dp))
+            Icon(imageVector = Icons.Filled.Search, contentDescription = "", tint = Color.Black, modifier = Modifier.size(22.dp))
             Spacer(modifier = Modifier.width(16.dp))
-            Icon(imageVector = Icons.Filled.Add, contentDescription = "", tint = Color.White, modifier = Modifier.size(22.dp))
+            Icon(imageVector = Icons.Filled.Add, contentDescription = "", tint = Color.Black, modifier = Modifier.size(22.dp))
         }
     }
 }
@@ -100,9 +92,9 @@ fun ShortcutRow() {
             .padding(horizontal = 24.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        ShortcutItem(icon = Icons.Filled.Favorite, label = "赞和收藏", bg = Color(0xFF2A2A2A), tint = Color(0xFFFF5A5A))
-        ShortcutItem(icon = Icons.Filled.PersonAdd, label = "新增关注", bg = Color(0xFF2A2A2A), tint = Color(0xFF4FB7FF))
-        ShortcutItem(icon = Icons.Filled.ChatBubble, label = "评论和@", bg = Color(0xFF2A2A2A), tint = Color(0xFF76D572))
+        ShortcutItem(icon = Icons.Filled.Favorite, label = "赞和收藏", bg = Color(0xFFF0F0F0), tint = Color(0xFFFF5A5A))
+        ShortcutItem(icon = Icons.Filled.PersonAdd, label = "新增关注", bg = Color(0xFFF0F0F0), tint = Color(0xFF4FB7FF))
+        ShortcutItem(icon = Icons.Filled.ChatBubble, label = "评论和@", bg = Color(0xFFF0F0F0), tint = Color(0xFF76D572))
     }
 }
 
@@ -119,7 +111,7 @@ fun ShortcutItem(icon: androidx.compose.ui.graphics.vector.ImageVector, label: S
             Icon(imageVector = icon, contentDescription = label, tint = tint, modifier = Modifier.size(28.dp))
         }
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = label, color = Color.White, fontSize = 12.sp)
+        Text(text = label, color = Color.DarkGray, fontSize = 12.sp)
     }
 }
 
@@ -131,14 +123,14 @@ fun EmptyState() {
             .padding(top = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(imageVector = Icons.Filled.ChatBubble, contentDescription = "", tint = Color(0xFF3A3A3A), modifier = Modifier.size(48.dp))
+        Icon(imageVector = Icons.Filled.ChatBubble, contentDescription = "", tint = Color(0xFF999999), modifier = Modifier.size(48.dp))
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "暂时没有消息", color = Color(0xFF8A8A8A), fontSize = 12.sp)
+        Text(text = "暂时没有消息", color = Color(0xFF666666), fontSize = 12.sp)
     }
 }
 
 @Composable
-fun SuggestionSection() {
+fun SuggestionSection(suggestedUsers: List<SuggestedUser>) {
     Column(modifier = Modifier.fillMaxSize()) {
         Row(
             modifier = Modifier
@@ -147,15 +139,15 @@ fun SuggestionSection() {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "你可能感兴趣的人", color = Color(0xFFB0B0B0), fontSize = 12.sp)
-            Text(text = "关闭", color = Color(0xFFB0B0B0), fontSize = 12.sp)
+            Text(text = "你可能感兴趣的人", color = Color(0xFF666666), fontSize = 12.sp)
+            Text(text = "关闭", color = Color(0xFF666666), fontSize = 12.sp)
         }
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(mockSuggestedUsers) { user ->
+            items(suggestedUsers) { user ->
                 SuggestionItem(user)
             }
         }
@@ -181,16 +173,16 @@ fun SuggestionItem(user: SuggestedUser) {
         Spacer(modifier = Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = user.name, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                Text(text = user.name, color = Color.Black, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                 if (user.tag != null) {
                     Spacer(modifier = Modifier.width(8.dp))
                     Card(
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF2A2A2A)),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0)),
                         shape = RoundedCornerShape(4.dp)
                     ) {
                         Text(
                             text = user.tag,
-                            color = Color(0xFFB0B0B0),
+                            color = Color(0xFF666666),
                             fontSize = 10.sp,
                             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                         )
@@ -198,7 +190,7 @@ fun SuggestionItem(user: SuggestedUser) {
                 }
             }
             Spacer(modifier = Modifier.height(2.dp))
-            Text(text = user.subtitle, color = Color(0xFF8A8A8A), fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(text = user.subtitle, color = Color(0xFF666666), fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         Button(
             onClick = {},
@@ -209,6 +201,6 @@ fun SuggestionItem(user: SuggestedUser) {
             Text(text = if (user.followed) "已关注" else "关注", color = Color.White, fontSize = 12.sp)
         }
         Spacer(modifier = Modifier.width(8.dp))
-        Icon(imageVector = Icons.Filled.Close, contentDescription = "", tint = Color(0xFF6A6A6A), modifier = Modifier.size(18.dp))
+        Icon(imageVector = Icons.Filled.Close, contentDescription = "", tint = Color(0xFF999999), modifier = Modifier.size(18.dp))
     }
 }

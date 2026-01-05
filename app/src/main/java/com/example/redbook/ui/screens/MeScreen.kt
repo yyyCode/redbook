@@ -52,20 +52,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.example.redbook.viewmodel.MeViewModel
+import com.example.redbook.viewmodel.UserProfile
+
 @Composable
-fun MeScreen() {
+fun MeScreen(viewModel: MeViewModel = viewModel()) {
+    val userProfile by viewModel.userProfile.collectAsState()
+    val selectedTab by viewModel.selectedTab.collectAsState()
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF191919)),
+            .background(Color(0xFFF5F5F5)),
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
         item { MeTopBar() }
-        item { ProfileHeader() }
-        item { StatRow() }
+        item { ProfileHeader(userProfile) }
+        item { StatRow(userProfile) }
         item { ActionButtons() }
         item { QuickCards() }
-        item { TabsSection() }
+        item { TabsSection(selectedTab, viewModel::onTabSelected) }
         item { EmptyCollection() }
     }
 }
@@ -79,22 +88,22 @@ fun MeTopBar() {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(imageVector = Icons.Filled.Menu, contentDescription = "", tint = Color.White, modifier = Modifier.size(22.dp))
+        Icon(imageVector = Icons.Filled.Menu, contentDescription = "", tint = Color.Black, modifier = Modifier.size(22.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0x33222222)),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFEDEDED)),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Text(text = "设置背景", color = Color.White, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp))
+                Text(text = "设置背景", color = Color.Black, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp))
             }
             Spacer(modifier = Modifier.width(12.dp))
-            Icon(imageVector = Icons.Filled.Share, contentDescription = "", tint = Color.White, modifier = Modifier.size(22.dp))
+            Icon(imageVector = Icons.Filled.Share, contentDescription = "", tint = Color.Black, modifier = Modifier.size(22.dp))
         }
     }
 }
 
 @Composable
-fun ProfileHeader() {
+fun ProfileHeader(userProfile: UserProfile) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -103,7 +112,7 @@ fun ProfileHeader() {
     ) {
         Box {
             AsyncImage(
-                model = "https://picsum.photos/100/100?random=21",
+                model = userProfile.avatarUrl,
                 contentDescription = "",
                 modifier = Modifier
                     .size(64.dp)
@@ -123,16 +132,16 @@ fun ProfileHeader() {
         }
         Spacer(modifier = Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = "烧仙草不加冰", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+            Text(text = userProfile.nickname, color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "小红书号：11574481733", color = Color(0xFFB0B0B0), fontSize = 12.sp)
+            Text(text = "小红书号：${userProfile.redbookId}", color = Color(0xFF666666), fontSize = 12.sp)
         }
-        Icon(imageVector = Icons.Filled.MoreHoriz, contentDescription = "", tint = Color.White, modifier = Modifier.size(22.dp))
+        Icon(imageVector = Icons.Filled.MoreHoriz, contentDescription = "", tint = Color.Black, modifier = Modifier.size(22.dp))
     }
 }
 
 @Composable
-fun StatRow() {
+fun StatRow(userProfile: UserProfile) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -140,34 +149,34 @@ fun StatRow() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "5", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-            Text(text = "关注", color = Color(0xFFB0B0B0), fontSize = 12.sp)
+            Text(text = userProfile.followingCount.toString(), color = Color.Black, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+            Text(text = "关注", color = Color(0xFF666666), fontSize = 12.sp)
         }
         Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "0", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-            Text(text = "粉丝", color = Color(0xFFB0B0B0), fontSize = 12.sp)
+            Text(text = userProfile.followersCount.toString(), color = Color.Black, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+            Text(text = "粉丝", color = Color(0xFF666666), fontSize = 12.sp)
         }
         Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "0", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-            Text(text = "获赞与收藏", color = Color(0xFFB0B0B0), fontSize = 12.sp)
+            Text(text = userProfile.likesAndCollectionsCount.toString(), color = Color.Black, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+            Text(text = "获赞与收藏", color = Color(0xFF666666), fontSize = 12.sp)
         }
         Spacer(modifier = Modifier.width(8.dp))
         Button(
             onClick = {},
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF353535)),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEDEDED)),
             shape = RoundedCornerShape(18.dp),
             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
         ) {
-            Icon(imageVector = Icons.Filled.Edit, contentDescription = "", tint = Color.White, modifier = Modifier.size(16.dp))
+            Icon(imageVector = Icons.Filled.Edit, contentDescription = "", tint = Color.Black, modifier = Modifier.size(16.dp))
             Spacer(modifier = Modifier.width(6.dp))
-            Text(text = "编辑资料", color = Color.White, fontSize = 12.sp)
+            Text(text = "编辑资料", color = Color.Black, fontSize = 12.sp)
         }
         Spacer(modifier = Modifier.width(8.dp))
         Card(
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF353535)),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFEDEDED)),
             shape = RoundedCornerShape(18.dp)
         ) {
-            Icon(imageVector = Icons.Filled.Settings, contentDescription = "", tint = Color.White, modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp))
+            Icon(imageVector = Icons.Filled.Settings, contentDescription = "", tint = Color.Black, modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp))
         }
     }
 }
@@ -181,23 +190,23 @@ fun ActionButtons() {
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Card(
-            colors = CardDefaults.cardColors(containerColor = Color(0x332A2A2A)),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFEDEDED)),
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier.weight(1f)
         ) {
             Column(modifier = Modifier.padding(12.dp)) {
-                Text(text = "创作灵感", color = Color.White, fontSize = 14.sp)
-                Text(text = "学创作的灵感", color = Color(0xFFB0B0B0), fontSize = 12.sp)
+                Text(text = "创作灵感", color = Color.Black, fontSize = 14.sp)
+                Text(text = "学创作的灵感", color = Color(0xFF666666), fontSize = 12.sp)
             }
         }
         Card(
-            colors = CardDefaults.cardColors(containerColor = Color(0x332A2A2A)),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFEDEDED)),
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier.weight(1f)
         ) {
             Column(modifier = Modifier.padding(12.dp)) {
-                Text(text = "浏览记录", color = Color.White, fontSize = 14.sp)
-                Text(text = "看过的笔记", color = Color(0xFFB0B0B0), fontSize = 12.sp)
+                Text(text = "浏览记录", color = Color.Black, fontSize = 14.sp)
+                Text(text = "看过的笔记", color = Color(0xFF666666), fontSize = 12.sp)
             }
         }
     }
@@ -235,7 +244,7 @@ fun QuickCardItem(
 ) {
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = Color(0x33333333)),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFEDEDED)),
         shape = RoundedCornerShape(8.dp)
     ) {
         Row(
@@ -245,43 +254,42 @@ fun QuickCardItem(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Color.White,
+                tint = Color.Black,
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Column {
-                Text(text = title, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                Text(text = subtitle, color = Color.Gray, fontSize = 10.sp)
+                Text(text = title, color = Color.Black, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                Text(text = subtitle, color = Color(0xFF666666), fontSize = 10.sp)
             }
         }
     }
 }
 
 @Composable
-fun TabsSection() {
+fun TabsSection(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
     val titles = listOf("笔记", "收藏", "赞过")
-    val selected = remember { mutableIntStateOf(0) }
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 12.dp)
     ) {
         TabRow(
-            selectedTabIndex = selected.intValue,
-            containerColor = Color(0xFF111111),
-            contentColor = Color.White,
+            selectedTabIndex = selectedTabIndex,
+            containerColor = Color.White,
+            contentColor = Color.Black,
             indicator = {}
         ) {
             titles.forEachIndexed { index, title ->
                 Tab(
-                    selected = selected.intValue == index,
-                    onClick = { selected.intValue = index },
+                    selected = selectedTabIndex == index,
+                    onClick = { onTabSelected(index) },
                     text = {
                         Text(
                             text = title,
-                            color = if (selected.intValue == index) Color.White else Color(0xFF8A8A8A),
+                            color = if (selectedTabIndex == index) Color.Black else Color(0xFF8A8A8A),
                             fontSize = 14.sp,
-                            fontWeight = if (selected.intValue == index) FontWeight.SemiBold else FontWeight.Normal
+                            fontWeight = if (selectedTabIndex == index) FontWeight.SemiBold else FontWeight.Normal
                         )
                     }
                 )
@@ -317,15 +325,15 @@ fun EmptyCollection() {
             Icon(imageVector = Icons.Filled.MoreHoriz, contentDescription = "", tint = Color(0xFF3A3A3A), modifier = Modifier.size(28.dp))
         }
         Spacer(modifier = Modifier.height(12.dp))
-        Text(text = "小红书冲浪新发现", color = Color(0xFF8A8A8A), fontSize = 13.sp)
+        Text(text = "小红书冲浪新发现", color = Color(0xFF666666), fontSize = 13.sp)
         Spacer(modifier = Modifier.height(12.dp))
         Button(
             onClick = {},
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF353535)),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEDEDED)),
             shape = RoundedCornerShape(20.dp),
             contentPadding = PaddingValues(horizontal = 18.dp, vertical = 8.dp)
         ) {
-            Text(text = "去发布", color = Color.White, fontSize = 12.sp)
+            Text(text = "去发布", color = Color.Black, fontSize = 12.sp)
         }
     }
 }

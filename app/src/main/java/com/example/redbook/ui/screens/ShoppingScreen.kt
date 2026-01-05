@@ -47,18 +47,24 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.example.redbook.viewmodel.ShoppingViewModel
 import com.example.redbook.model.Product
-import com.example.redbook.model.mockProducts
 
 @Composable
-fun ShoppingScreen() {
+fun ShoppingScreen(viewModel: ShoppingViewModel = viewModel()) {
+    val products by viewModel.products.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF5F5F5)) // Light gray background
     ) {
         // Top Search Bar
-        SearchBar()
+        SearchBar(query = searchQuery, onQueryChange = viewModel::onSearchQueryChange)
 
         LazyVerticalStaggeredGrid(
             columns = StaggeredGridCells.Fixed(2),
@@ -78,7 +84,7 @@ fun ShoppingScreen() {
             }
 
             // Product Waterfall Grid
-            items(mockProducts + mockProducts) { product ->
+            items(products) { product ->
                 ProductItem(product)
             }
         }
@@ -86,7 +92,7 @@ fun ShoppingScreen() {
 }
 
 @Composable
-fun SearchBar() {
+fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -112,7 +118,7 @@ fun SearchBar() {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "男生秋冬穿搭",
+                    text = if (query.isEmpty()) "男生秋冬穿搭" else query,
                     color = Color.Gray,
                     fontSize = 14.sp
                 )
