@@ -14,4 +14,11 @@ class MainViewModel(userPreferencesRepository: UserPreferencesRepository) : View
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = false
         )
+
+    val isLoggedIn: StateFlow<Boolean> = userPreferencesRepository.isLoggedIn
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
 }

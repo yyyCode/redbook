@@ -24,6 +24,8 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector?
     object PostDetail : Screen("post/{postId}", "笔记详情") {
         fun createRoute(postId: String) = "post/$postId"
     }
+    
+    object Login : Screen("login", "登录")
 }
 
 val bottomNavItems = listOf(

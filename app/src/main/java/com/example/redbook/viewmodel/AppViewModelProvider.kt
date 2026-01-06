@@ -26,6 +26,9 @@ object AppViewModelProvider {
         initializer {
             MainViewModel(redBookApplication().container.userPreferencesRepository)
         }
+        initializer {
+            LoginViewModel(redBookApplication().container.authRepository)
+        }
     }
 }
 

@@ -6,9 +6,10 @@ import com.example.redbook.data.repository.MessageRepository
 import com.example.redbook.data.repository.PostRepository
 import com.example.redbook.data.repository.ShoppingRepository
 import com.example.redbook.data.repository.UserPreferencesRepository
+import com.example.redbook.data.repository.AuthRepository
 import com.example.redbook.data.repository.dataStore
 import com.example.redbook.data.remote.WebSocketManager
-import com.example.redbook.data.remote.ApiService
+import com.example.redbook.network.ApiService
 import com.example.redbook.util.NotificationHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,7 +53,7 @@ class AppContainer(private val context: Application) {
     // 3. 配置 Retrofit
     private val retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl("https://mock.api.com/") // 替换为真实的 Base URL
+            .baseUrl("http://10.0.2.2:8080/") // Use 10.0.2.2 for Android Emulator to access localhost
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -65,4 +66,5 @@ class AppContainer(private val context: Application) {
     val shoppingRepository by lazy { ShoppingRepository(database.productDao()) }
     val messageRepository by lazy { MessageRepository(database.suggestedUserDao(), webSocketManager) }
     val userPreferencesRepository by lazy { UserPreferencesRepository(context.dataStore) }
+    val authRepository by lazy { AuthRepository(apiService, userPreferencesRepository) }
 }

@@ -1,8 +1,58 @@
 const WebSocket = require('ws');
+const http = require('http');
 
-const wss = new WebSocket.Server({ port: 8080 });
+// HTTP Server for Login API
+const server = http.createServer((req, res) => {
+  // CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-console.log('WebSocket server started on ws://localhost:8080');
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
+  if (req.url === '/login' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
+    req.on('end', () => {
+      try {
+        const { phone, code } = JSON.parse(body);
+        if (phone && code === '8888') { // Simple mock validation
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({
+            success: true,
+            token: 'mock-jwt-token-' + Date.now(),
+            user: {
+              id: 10086,
+              name: 'RedBookUser',
+              avatar: 'https://picsum.photos/100/100'
+            }
+          }));
+        } else {
+          res.writeHead(401, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, message: '验证码错误 (默认8888)' }));
+        }
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: 'Invalid JSON' }));
+      }
+    });
+  } else {
+    res.writeHead(404);
+    res.end();
+  }
+});
+
+const wss = new WebSocket.Server({ server });
+
+server.listen(8080, () => {
+  console.log('Server started on http://localhost:8080 (WebSocket + HTTP)');
+});
 
 wss.on('connection', function connection(ws) {
   console.log('Client connected');

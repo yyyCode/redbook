@@ -44,9 +44,17 @@ import android.net.Uri
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 
+import com.example.redbook.ui.screens.LoginScreen
+import com.example.redbook.viewmodel.MainViewModel
+import com.example.redbook.viewmodel.AppViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
+
 @Composable
-fun MainScreen() {
+fun MainScreen(viewModel: MainViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
     val context = LocalContext.current
+    val isLoggedIn by viewModel.isLoggedIn.collectAsState()
+
     
     // 启动 WebSocketService
     DisposableEffect(Unit) {
@@ -89,8 +97,8 @@ fun MainScreen() {
         bottomBar = {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination
-            // Hide bottom bar on Publish screen
-            if (currentDestination?.route?.startsWith("publish/") != true) {
+            // Hide bottom bar on Publish screen and Login screen
+            if (currentDestination?.route?.startsWith("publish/") != true && currentDestination?.route != Screen.Login.route) {
                 NavigationBar(
                     containerColor = Color.White
                 ) {
@@ -100,14 +108,19 @@ fun MainScreen() {
                             label = { Text(screen.title) },
                             selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                             onClick = {
-                                if (screen.route == Screen.Add.route) {
+                                if ((screen == Screen.Message || screen == Screen.Me || screen == Screen.Add) && !isLoggedIn) {
+                                    navController.navigate(Screen.Login.route)
+                                } else if (screen == Screen.Add) {
                                     photoPickerLauncher.launch(
                                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                                     )
                                 } else {
                                     navController.navigate(screen.route) {
-                                        popUpTo(navController.graph.findStartDestination().id)
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
                                         launchSingleTop = true
+                                        restoreState = true // Keep restoreState for standard nav, but be careful with deep links mixed in
                                     }
                                 }
                             },
@@ -169,6 +182,17 @@ fun MainScreen() {
                     onBackClick = { navController.popBackStack() },
                     onPublishClick = {
                         // TODO: Implement actual publish logic (save to DB, etc.)
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(Screen.Login.route) {
+                LoginScreen(
+                    onLoginSuccess = {
+                        navController.popBackStack()
+                    },
+                    onCloseClick = {
                         navController.popBackStack()
                     }
                 )
