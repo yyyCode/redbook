@@ -9,6 +9,7 @@ import com.example.redbook.data.repository.UserPreferencesRepository
 import com.example.redbook.data.repository.dataStore
 import com.example.redbook.data.remote.WebSocketManager
 import com.example.redbook.data.remote.ApiService
+import com.example.redbook.util.NotificationHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -35,6 +36,8 @@ class RedBookApplication : Application() {
 class AppContainer(private val context: Application) {
     val database by lazy { AppDatabase.getDatabase(context) }
     
+    val notificationHelper by lazy { NotificationHelper(context) }
+
     // 1. 创建共享的 OkHttpClient
     // 这样 WebSocket 和 Retrofit 可以共享连接池、拦截器等配置
     private val okHttpClient by lazy {

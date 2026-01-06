@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 import androidx.lifecycle.viewModelScope
 import com.example.redbook.data.repository.MessageRepository
+import com.example.redbook.util.NotificationHelper
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -21,7 +22,10 @@ data class SuggestedUser(
     val followed: Boolean = false
 )
 
-class MessageViewModel(private val messageRepository: MessageRepository) : ViewModel() {
+class MessageViewModel(
+    private val messageRepository: MessageRepository,
+    private val notificationHelper: NotificationHelper // 注入 NotificationHelper
+) : ViewModel() {
     val suggestedUsers: StateFlow<List<SuggestedUser>> = messageRepository.suggestedUsers
         .stateIn(
             scope = viewModelScope,
@@ -33,11 +37,6 @@ class MessageViewModel(private val messageRepository: MessageRepository) : ViewM
     val notifications: StateFlow<List<String>> = _notifications.asStateFlow()
 
     init {
-        // 连接 WebSocket 服务
-        // Android 模拟器使用 10.0.2.2 访问宿主机 localhost
-        // 如果是真机调试，请使用电脑局域网 IP
-        messageRepository.connectToWebSocket("ws://10.0.2.2:8080")
-
         viewModelScope.launch {
             messageRepository.messageFlow.collect { message ->
                 _notifications.value = _notifications.value + message

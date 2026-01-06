@@ -20,6 +20,10 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector?
     object Publish : Screen("publish/{imageUri}", "发布") {
         fun createRoute(imageUri: String) = "publish/${Uri.encode(imageUri)}"
     }
+
+    object PostDetail : Screen("post/{postId}", "笔记详情") {
+        fun createRoute(postId: String) = "post/$postId"
+    }
 }
 
 val bottomNavItems = listOf(

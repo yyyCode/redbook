@@ -24,15 +24,57 @@ import com.example.redbook.ui.screens.MeScreen
 import com.example.redbook.ui.screens.MessageScreen
 import com.example.redbook.ui.screens.ShoppingScreen
 import com.example.redbook.ui.screens.PublishScreen
+import com.example.redbook.ui.screens.PostDetailScreen
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
+
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.platform.LocalContext
+import android.content.Intent
+import com.example.redbook.service.WebSocketService
+import android.os.Build
+
+import androidx.core.util.Consumer
+import androidx.activity.ComponentActivity
+import android.net.Uri
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 
 @Composable
 fun MainScreen() {
+    val context = LocalContext.current
+    
+    // 启动 WebSocketService
+    DisposableEffect(Unit) {
+        val intent = Intent(context, WebSocketService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startService(intent)
+        } else {
+            context.startService(intent)
+        }
+        onDispose {}
+    }
+
     val navController = rememberNavController()
+
+    // 处理 DeepLink (热启动/onNewIntent)，避免重复处理
+    val lastHandledUri = remember { mutableStateOf<Uri?>(null) }
+    DisposableEffect(Unit) {
+        val activity = context as? ComponentActivity
+        val listener = Consumer<Intent> { intent ->
+            val uri = intent.data
+            if (uri != null && uri != lastHandledUri.value) {
+                navController.handleDeepLink(intent)
+                lastHandledUri.value = uri
+            }
+        }
+        activity?.addOnNewIntentListener(listener)
+        onDispose { activity?.removeOnNewIntentListener(listener) }
+    }
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
@@ -64,11 +106,8 @@ fun MainScreen() {
                                     )
                                 } else {
                                     navController.navigate(screen.route) {
-                                        popUpTo(navController.graph.findStartDestination().id) {
-                                            saveState = true
-                                        }
+                                        popUpTo(navController.graph.findStartDestination().id)
                                         launchSingleTop = true
-                                        restoreState = true
                                     }
                                 }
                             },
@@ -90,7 +129,12 @@ fun MainScreen() {
         ) {
             composable(Screen.Home.route) { HomeScreen() }
             composable(Screen.Shopping.route) { ShoppingScreen() }
-            composable(Screen.Message.route) { MessageScreen() }
+            composable(
+                route = Screen.Message.route,
+                deepLinks = listOf(
+                    navDeepLink { uriPattern = "redbook://message" }
+                )
+            ) { MessageScreen() }
             composable(Screen.Me.route) { 
                 MeScreen(
                     onPublishClick = {
@@ -101,6 +145,20 @@ fun MainScreen() {
                 ) 
             }
             
+            composable(
+                route = Screen.PostDetail.route,
+                arguments = listOf(navArgument("postId") { type = NavType.StringType }),
+                deepLinks = listOf(
+                    navDeepLink { uriPattern = "redbook://post/{postId}" }
+                )
+            ) { backStackEntry ->
+                val postId = backStackEntry.arguments?.getString("postId") ?: ""
+                PostDetailScreen(
+                    postId = postId,
+                    onBackClick = { navController.popBackStack() }
+                )
+            }
+
             composable(
                 route = Screen.Publish.route,
                 arguments = listOf(navArgument("imageUri") { type = NavType.StringType })

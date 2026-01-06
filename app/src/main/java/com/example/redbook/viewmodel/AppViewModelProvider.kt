@@ -15,7 +15,10 @@ object AppViewModelProvider {
             ShoppingViewModel(redBookApplication().container.shoppingRepository)
         }
         initializer {
-            MessageViewModel(redBookApplication().container.messageRepository)
+            MessageViewModel(
+                redBookApplication().container.messageRepository,
+                redBookApplication().container.notificationHelper
+            )
         }
         initializer {
             MeViewModel(redBookApplication().container.userPreferencesRepository)
