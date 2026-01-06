@@ -59,6 +59,28 @@
 - **纯 Compose UI**：完全基于 Jetpack Compose 构建，状态驱动 UI（StateFlow），实现瀑布流、吸顶 Tab 等复杂交互。
 - **工程规范**：模块边界清晰，遵循单一数据源原则，代码可读性与可维护性强。
 
+## 通知与 DeepLink 跳转
+- 架构模式：后端推送结构化 JSON → 客户端 Service 解析 → 构造 DeepLink → Navigation 统一路由跳转
+- 消息协议（建议）：
+  - 最小字段：`type`（事件类型）、`text`（通知文案）、`target`（目标类型）、`targetId`（目标 ID）
+  - 或直接下发 `deeplink` 字段，客户端仅校验并打开
+  - 示例：`{"type":"like","target":"post","targetId":"12345","text":"有人点赞了你"}` 或 `{"deeplink":"redbook://post/12345","text":"有人点赞了你"}`
+- DeepLink 规范：
+  - `redbook://message`（消息页）
+  - `redbook://post/{postId}`（笔记详情）
+  - `redbook://user/{userId}`（用户主页，预留）
+  - `redbook://conversation/{convId}` 或 `redbook://message?convId={id}`（会话页，预留）
+- 客户端实现：
+  - 前台服务解析 JSON 并分发到通知/跳转：[WebSocketService.kt](file:///e:/kotlin/redbook/app/src/main/java/com/example/redbook/service/WebSocketService.kt)
+  - 构建通知与 PendingIntent（单实例唤起）：[NotificationHelper.kt](file:///e:/kotlin/redbook/app/src/main/java/com/example/redbook/util/NotificationHelper.kt)
+  - NavHost 注册 DeepLink 路由： [MainScreen.kt](file:///e:/kotlin/redbook/app/src/main/java/com/example/redbook/ui/MainScreen.kt)、[RedBookNavigation.kt](file:///e:/kotlin/redbook/app/src/main/java/com/example/redbook/ui/navigation/RedBookNavigation.kt)
+- 本地调试：
+  - Node.js 服务每 20 秒推送 JSON 消息：[server.js](file:///e:/kotlin/redbook/server/server.js)
+  - ADB 手动验证：`adb shell am start -W -a android.intent.action.VIEW -d "redbook://post/8888" com.example.redbook`
+- 注意事项：
+  - Android 13+ 需通知权限（已处理检查）
+  - 使用 `FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_SINGLE_TOP` 保证单实例唤起与 `onNewIntent` 交付
+
 ## 项目截图（占位）
 请将实际截图替换下方占位路径并提交到仓库中。
 
