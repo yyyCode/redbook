@@ -11,8 +11,7 @@ import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okio.ByteString
 
-class WebSocketManager {
-    private val client = OkHttpClient()
+class WebSocketManager(private val client: OkHttpClient = OkHttpClient()) {
     private var webSocket: WebSocket? = null
 
     // 用于发送接收到的消息

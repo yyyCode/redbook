@@ -53,6 +53,7 @@
 ## 项目亮点
 - **实时通信能力**：自建 `WebSocketManager` 网络层封装，结合 Node.js 本地服务，实现了完整的客户端-服务端实时消息推送链路。
 - **现代化架构**：采用 MVVM + Repository 模式，配合手动依赖注入（AppContainer），职责分明，易于测试。
+- **混合网络栈**：同时集成 WebSocket (OkHttp) 与 REST API (Retrofit)，并共享底层 `OkHttpClient` 连接池，最大化资源利用率。
 - **数据持久化**：集成 Room 数据库处理结构化数据（笔记、商品），使用 DataStore 管理用户偏好（深色模式）。
 - **原生体验**：利用 Activity Result API 实现丝滑的本地相册访问与图片选择功能。
 - **纯 Compose UI**：完全基于 Jetpack Compose 构建，状态驱动 UI（StateFlow），实现瀑布流、吸顶 Tab 等复杂交互。
