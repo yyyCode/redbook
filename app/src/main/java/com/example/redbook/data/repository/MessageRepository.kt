@@ -2,12 +2,18 @@ package com.example.redbook.data.repository
 
 import com.example.redbook.data.local.dao.SuggestedUserDao
 import com.example.redbook.data.local.entity.SuggestedUserEntity
+import com.example.redbook.data.remote.WebSocketManager
 import com.example.redbook.viewmodel.SuggestedUser
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
-class MessageRepository(private val suggestedUserDao: SuggestedUserDao) {
+class MessageRepository(
+    private val suggestedUserDao: SuggestedUserDao,
+    private val webSocketManager: WebSocketManager
+) {
     val suggestedUsers: Flow<List<SuggestedUser>> = suggestedUserDao.getAllSuggestedUsers().map { entities ->
         entities.map { entity ->
             SuggestedUser(
@@ -18,6 +24,32 @@ class MessageRepository(private val suggestedUserDao: SuggestedUserDao) {
                 tag = entity.tag,
                 followed = entity.followed
             )
+        }
+    }
+
+    // 真实消息流
+    val messageFlow: Flow<String> = webSocketManager.messageFlow
+
+    fun connectToWebSocket(url: String) {
+        webSocketManager.connect(url)
+    }
+
+    fun disconnectWebSocket() {
+        webSocketManager.disconnect()
+    }
+
+    // 模拟实时消息流 (保留作为参考或备用)
+    fun simulateMessageStream(): Flow<String> = flow {
+        val messages = listOf(
+            "收到一条新点赞",
+            "有人关注了你",
+            "你的笔记被收藏了",
+            "收到一条新评论",
+            "系统通知：欢迎使用 RedBook"
+        )
+        while (true) {
+            delay(5000) // 每5秒模拟一条消息
+            emit(messages.random())
         }
     }
 

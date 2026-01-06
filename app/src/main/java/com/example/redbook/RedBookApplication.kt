@@ -7,6 +7,7 @@ import com.example.redbook.data.repository.PostRepository
 import com.example.redbook.data.repository.ShoppingRepository
 import com.example.redbook.data.repository.UserPreferencesRepository
 import com.example.redbook.data.repository.dataStore
+import com.example.redbook.data.remote.WebSocketManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,8 +31,10 @@ class RedBookApplication : Application() {
 class AppContainer(private val context: Application) {
     val database by lazy { AppDatabase.getDatabase(context) }
     
+    val webSocketManager by lazy { WebSocketManager() }
+
     val postRepository by lazy { PostRepository(database.postDao()) }
     val shoppingRepository by lazy { ShoppingRepository(database.productDao()) }
-    val messageRepository by lazy { MessageRepository(database.suggestedUserDao()) }
+    val messageRepository by lazy { MessageRepository(database.suggestedUserDao(), webSocketManager) }
     val userPreferencesRepository by lazy { UserPreferencesRepository(context.dataStore) }
 }

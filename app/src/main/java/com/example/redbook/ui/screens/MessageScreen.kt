@@ -50,19 +50,92 @@ import com.example.redbook.viewmodel.MessageViewModel
 import com.example.redbook.viewmodel.AppViewModelProvider
 import com.example.redbook.viewmodel.SuggestedUser
 
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+
 @Composable
 fun MessageScreen(viewModel: MessageViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
     val suggestedUsers by viewModel.suggestedUsers.collectAsState()
+    val notifications by viewModel.notifications.collectAsState()
+    
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
+    LaunchedEffect(notifications) {
+        if (notifications.isNotEmpty()) {
+            val lastMessage = notifications.last()
+            scope.launch {
+                snackbarHostState.showSnackbar(lastMessage)
+            }
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFFF5F5F5))
+        ) {
+            TopBar()
+            ShortcutRow()
+            
+            if (notifications.isEmpty()) {
+                EmptyState()
+            } else {
+                NotificationList(notifications)
+            }
+            
+            SuggestionSection(suggestedUsers)
+        }
+        
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 80.dp) // Avoid covering bottom nav
+        )
+    }
+}
+
+@Composable
+fun NotificationList(notifications: List<String>) {
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        TopBar()
-        ShortcutRow()
-        EmptyState()
-        SuggestionSection(suggestedUsers)
+        notifications.forEach { message ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // 模拟头像
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(Color.Gray)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text(
+                        text = "系统通知", // 模拟用户名
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = message,
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                }
+            }
+        }
     }
 }
 
